@@ -4,47 +4,40 @@
 
 
 /* ===== JQuery ajax section starts ====== */
-$("#sku").on('keyup', function () {
+$("#sku").on('keyup', function() {
+  // Clear any previous timeouts
+  clearTimeout($(this).data('timeout'));
 
-  var sku = $("#sku").val();
+  // Set a new timeout
+  var timeout = setTimeout(function() {
+    var sku = $("#sku").val();
 
-  $.ajax({
-    url: 'post.process.php',
-    type: "POST",
-    data: { sku: sku },
-    success: function (datas) {
-
-      if (datas == 'exists') {
-
-
-        // show an error message if the sku id already exists
-
-        alert("SKU Id already exists Please choose another one");
-        $('#error-message').html('<p style = "color:red">SKU id already exists</p>');
-        $("#save").attr("disabled", true);
-
-
+    $.ajax({
+      url: 'post.process.php',
+      type: "POST",
+      data: { sku: sku },
+      success: function (datas) {
+        if (datas == 'exists') {
+          // show an error message if the sku id already exists
+          alert("SKU Id already exists. Please choose another one");
+          $('#error-message').html('<p style="color:red">SKU id already exists</p>');
+          $("#save").attr("disabled", true);
+        } else if (sku == "" || sku <= 0) {
+          // show an available message if the sku id does not exist
+          $('#error-message').html('<p style="color:red">Please enter SKU Id</p>');
+          $("#save").attr("disabled", true);
+        } else {
+          $('#error-message').html('<p style="color:green">SKU ID is available</p>');
+          $("#save").attr("disabled", false);
+        }
       }
+    });
+  }, 1000); // Delay for 1000 milliseconds (1 seconds)
 
-      else if (sku == "" || sku <= 0) {
-
-        // show an available message if the sku id does not exists
-
-        $('#error-message').html('<p style = "color:red">Please enter sku Id</p>');
-        $("#save").attr("disabled", true);
-
-      }
-
-      else {
-
-        $('#error-message').html('<p style = "color:green">SKU ID is available</p>');
-        $("#save").attr("disabled", false);
-
-      }
-    }
-  });
-
+  // Store the timeout ID for clearing it later
+  $(this).data('timeout', timeout);
 });
+
 
 
 /* ===== JQuery ajax section ends ====== */
